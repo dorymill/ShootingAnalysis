@@ -1,0 +1,105 @@
+df = pd.read_json(file)
+
+Stage 1 Bay1 Example:
+
+    >>> df['Stage 1 Bay1'][1][1]['Carry Optics'][0].get('points')      
+    132
+    >>> df['Stage 1 Bay1'][1][1]['Carry Optics'][0].get('shootername') 
+    >>> df['Stage 1 Bay1'][1][1]['Carry Optics'][0].get('shooterName')
+    'Orr, Taylor'
+
+Stage 2 Bay 2 Ex:
+
+    >>> df['Stage 2 Bay 2'][2][1]['Carry Optics'][0] 
+    {'place': 1, 'shooter': 'mmShooter_6524566', 'shooterNum': -1, 'shooterName': 'Jennings, Jeff', 'division': 'Carry Optics', 'shooterClass': 'A', 'stagePercent': '100.00', 'stageTimeSecs': '22.39', 'stagePoints': '125.0000', 'hitFactor': '5.4935', 'points': 123, 'penalties': 0}
+
+Stage 3 Bay 3 Ex:
+
+    >>> df['Stage 3 Bay 3'][3][1]['Carry Optics'][0] 
+    {'place': 1, 'shooter': 'mmShooter_6505565', 'shooterNum': -1, 'shooterName': 'Espinosa, Joshua', 'division': 'Carry Optics', 'shooterClass': 'M', 'stagePercent': '100.00', 'stageTimeSecs': '22.74', 'stagePoints': '160.0000', 'hitFactor': '6.8602', 'points': 156, 'penalties': 0}
+
+etc...
+
+Sweeping fields:
+
+    >>> for key in df['Stage 3 Bay 3'][3][1]['Carry Optics']:    
+    ...     print(key.get('shooterName'))
+    ...     print("\n")
+    ... 
+    Espinosa, Joshua
+
+
+    Williams, Chase
+
+
+    Perry, Nate
+
+
+    Kohlenberg, Terry
+
+
+General Stage Structure
+
+- Stage Name (e.x. 'Stage 1 Bay1') (dict)
+
+    >>> df.keys()
+    Index(['Match', 'stageUUID', 'Stage 1 Bay1', 'Stage 2 Bay 2', 'Stage 3 Bay 3',
+       'Stage 4 Bay 4', 'Stage 5 Classifier 24-01', 'Stage 6 Bay 5 '],
+        dtype='object')
+
+    stageUUID is anomolous, calculate the stage key numbers as the index value - 2. Stage 1's key is thus 3-2 = 1
+
+    - Stage Key Number (0 = Overall, 1 = Stage 1, 2 = Stage 2, ...) (list)
+
+        >>> df['Stage 2 Bay 2'] 
+        0                                                  NaN
+        1                                                  NaN
+        2    [{'Overall': [{'place': 1, 'shooter': 'mmShoot...
+        3                                                  NaN
+        4                                                  NaN
+        5                                                  NaN
+        6                                                  NaN
+        Name: Stage 2 Bay 2, dtype: object
+        >>> df['Stage 3 Bay 3']        
+        0                                                  NaN
+        1                                                  NaN
+        2                                                  NaN
+        3    [{'Overall': [{'place': 1, 'shooter': 'mmShoot...
+        4                                                  NaN
+        5                                                  NaN
+        6                                                  NaN
+        Name: Stage 3 Bay 3, dtype: object
+
+        - Divison Number (0 = Overall, 1 = Carry Optics, 2 = Limited, ...) (dict)
+
+            >>> df['Stage 3 Bay 3'][3] ( Returns a list of dicts for everyone on the stage in all divisions)
+
+            - Divison Key String (Must correspond to Divison number, e.x. Div Num = 2, this = 'Carry Optics')
+
+                This returns a dictionary of a single key containing a list of dictionaries for the individual shooters
+
+                >>> df['Stage 3 Bay 3'][3][2].keys()
+                dict_keys(['Limited'])
+                >>> df['Stage 3 Bay 3'][3][3].keys() 
+                dict_keys(['Limited Optics'])
+                >>> df['Stage 3 Bay 3'][3][1].keys() 
+                dict_keys(['Carry Optics'])
+
+                df['Stage 3 Bay 3'][3][1]['Carry Optics'] is the list of dicts itself.
+
+                - Shooter Class Attributes (dict)
+
+                This is where the data is at, accessible via the following keys
+
+                >>> df['Stage 3 Bay 3'][3][1]['Carry Optics'][0].keys() 
+                dict_keys(['place', 'shooter', 'shooterNum', 'shooterName', 'division', 'shooterClass', 'stagePercent', 'stageTimeSecs', 'stagePoints', 'hitFactor', 'points', 'penalties'])
+                
+                >>> df['Stage 3 Bay 3'][3][1]['Carry Optics'][0].get('shooterName') 
+                'Espinosa, Joshua'
+
+                e.g. the name and hit factor of the 1st place shooter on the stage in carry optics (shooters organized by stage.)
+
+
+
+
+
