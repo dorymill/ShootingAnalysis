@@ -4,33 +4,30 @@
 
 class Stage:
 
-    # Stage name
-    stageName = ""
-
-    # List of shooters (list of dictionaries)
-    shooterList = []
-
-    # This shall be a list of tuples, (mean, std.dev) for each parameter, 
-    # ordered by ranks, high to low
-    divisonHFStats = []
-    classHFStats   = []
-
-    divisonTimeStats = []
-    classTimeStats   = []
-
-    divisonPenStats = []
-    classPenStats   = []
-
-    divisonPointStats = []
-    classPointStats   = []
-
-    divisonStagePointsStats = []
-    classStagePointsStats   = []
-
-    count = 0
-
+    # Instace class attribute initialization
     def __init__(self, stageName):
-        self.stageName = stageName;
+        # Stage name
+        self.stageName = stageName
+
+        # List of shooters (list of dictionaries)
+        self.shooterList = []
+
+        # This shall be a list of tuples, (mean, std.dev) for each parameter, 
+        # ordered by ranks, high to low
+        self.divisonHFStats = []
+        self.classHFStats   = []
+
+        self.divisonTimeStats = []
+        self.classTimeStats   = []
+
+        self.divisonPenStats = []
+        self.classPenStats   = []
+
+        self.divisonPointStats = []
+        self.classPointStats   = []
+
+        self.divisonStagePointsStats = []
+        self.classStagePointsStats   = []
         
 
     # Run through the classs and populate the statistics
@@ -44,8 +41,6 @@ class Stage:
     def addShooter(self, shooter):
         if(shooter.parentStage == self.stageName):
             self.shooterList.append(shooter)
-            self.count += 1
-            #print(f'{shooter.parentStage} == {self.stageName}')
 
     def showHitFactors(self):
 
@@ -58,10 +53,3 @@ class Stage:
         print(f'\n{self.stageName} has {len(self.shooterList)} shooters.')
         return len(self.shooterList)
     
-    def prune(self):
-        # For some reason shooters from all of the other stages make it
-        # into the individual shooterLists. Pruning the ones that don't belong.
-
-        for shooter in self.shooterList:
-            if str(shooter.parentStage) != str(self.stageName):
-                self.shooterList.remove(shooter)
