@@ -4,11 +4,9 @@
 
 from Stage import Stage
 from Shooter import Shooter
-from typing import List
 import pandas as pd
-import json
 
-class Match:
+class Match():
 
     # File dataframe
     fileName = ""
@@ -16,6 +14,7 @@ class Match:
     # List Stages inside of a match and list for their keys
     stageList = []
     stageKeys = []
+    masterShooterList = []
 
     def __init__(self,  file):
         self.fileName = file
@@ -40,10 +39,8 @@ class Match:
 
             # Iterate over the shooter list by division since overall
             # contains Nxshooters worth of objects, N = stages
-            stage = Stage (key)
+            stage = Stage (str(key))
 
-            count = 0
-            totalShooters = 0
             for divCounter in range(1,9):
 
                 divString = ""
@@ -66,13 +63,11 @@ class Match:
                     divString = 'Single Stack'
 
                 # Grab the list of dicts for the shooters
+                shooterList = []
                 shooterList = dataFrame[key][keyCounter][divCounter][divString]
-                totalShooters += len(shooterList)
-                print(f'Total Shooters in {key} | {totalShooters}')
 
                 for shooter in shooterList:
-                    count += 1
-                    # Construct the shooter and add them to the stage!
+                    # Construct the master shooter list
                     newShooter = Shooter(
 
                         key,
@@ -88,28 +83,39 @@ class Match:
                         shooter.get('penalties')
                     )
 
-                    stage.addShooter(newShooter)
-                    # print(f'Add Shooter Functional Calls:\t\t{count}')
-                    # print(f'Length of current shooterList:\t\t{len(stage.shooterList)}')
+                    if stage.stageName == newShooter.parentStage:
+                        stage.addShooter(newShooter)
 
-            
             self.stageList.append(stage)
 
             keyCounter += 1
+                
+
 
 
 
 if __name__ == "__main__":
 
-    mtch = Match ("../resultsfile.json")
+    mtch = Match ("resultsfile.json")
 
     mtch.populateStages()
 
     # This is showing 375, implying that everyone is being added 6x to every stage
     # albeit there being only ~63 calls to addShooter on any given stage
-    stage = mtch.stageList[1]
+    # for stage in mtch.stageList:
+    #     stage.prune() 
 
-    print(len(stage.shooterList))
 
-    #stage1.showHitFactors ()
+    stage = mtch.stageList[0]
+    stage.prune()
+
+    for shooter in stage.shooterList:
+        print(f'{shooter.parentStage}')
+
+
+    print(f'\nStage 1 has {len(stage.shooterList)} shooters.')
+
+    # for shooter in stage.shooterList:
+    #     print(f'Stage 1 Shooter parentStage: {shooter.parentStage}')
+    #     print(f'Stage Name: {stage.stageName}')
 
