@@ -9,8 +9,11 @@ import time
 
 class Match():
 
+    # Tracked shooter (statistical highlighting)
+    trackedShooter = ""
+
     # Initialize instance attritbutes
-    def __init__(self,  file):
+    def __init__(self,  file, trackedShooter):
 
         self.fileName = file
 
@@ -18,7 +21,7 @@ class Match():
         self.stageList = []
         self.stageKeys = []
         self.masterShooterList = []
-
+        self.trackedShooter = trackedShooter
 
     # Populate stages with shooters
     def populateStages(self):
@@ -35,7 +38,7 @@ class Match():
 
         # Create the stages iteratively
         for key in self.stageKeys:
-            self.stageList.append(Stage (key))
+            self.stageList.append(Stage (key, self.trackedShooter))
 
     def fillStages(self):
         start = time.time()
@@ -87,6 +90,7 @@ class Match():
                         stage.addShooter(newShooter)
             
             keyCounter += 1
+
         stop = time.time()    
         print(f'Done! ({stop - start:0.3f}s)')
 
@@ -94,15 +98,13 @@ class Match():
 if __name__ == "__main__":
 
 
-    mtch = Match ("resultsfile.json")
+    mtch = Match ("resultsfile.json", "Miller, Doryan")
 
     mtch.populateStages()
     mtch.fillStages()
 
-
-
-    print("\n")
     for stage in mtch.stageList:
-        print(f'{stage.stageName} has {len(stage.shooterList)} shooters.')
+        stage.loadAll()
+        stage.showClassStats("G")
 
 
