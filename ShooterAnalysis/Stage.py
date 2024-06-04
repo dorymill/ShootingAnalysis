@@ -326,7 +326,7 @@ class Stage:
 
             plt.vlines(x = trackedParam, ymin = 0, ymax = norm.pdf(trackedParam, mu, std),
                                 colors = 'blue',
-                                label = self.trackedShooter)
+                                label = f'{self.trackedShooter} ({trackedParam})')
             
             # Plot parameters
             plt.title(f'{para} Distribution for {self.stageName} ({sClass})')
@@ -393,8 +393,8 @@ class Stage:
                         trackedParam = shooter.penalties
 
             plt.vlines(x = trackedParam, ymin = 0, ymax = norm.pdf(trackedParam, mu, std),
-                                colors = 'black',
-                                label = self.trackedShooter)
+                                colors = 'blue',
+                                label = f'{self.trackedShooter} ({trackedParam})')
 
             
             # Plot parameters
