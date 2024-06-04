@@ -325,11 +325,12 @@ class Stage:
                         trackedParam = shooter.penalties
 
             plt.vlines(x = trackedParam, ymin = 0, ymax = norm.pdf(trackedParam, mu, std),
-                                colors = 'black',
+                                colors = 'blue',
                                 label = self.trackedShooter)
             
             # Plot parameters
             plt.title(f'{para} Distribution for {self.stageName} ({sClass})')
+            plt.legend()
             plt.set_cmap('gray')
             plt.xlabel(para)
             plt.ylabel("Amplitude")

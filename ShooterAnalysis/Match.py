@@ -12,6 +12,10 @@ class Match():
     # Tracked shooter (statistical highlighting)
     trackedShooter = ""
 
+    # Possible Shooter Divisions
+    divisions = ["Carry Optics", "Limited", "Limited Optics", "Open", 
+                "PCC", "Production", "Revolver", "Single Stack"]
+
     # Initialize instance attritbutes
     def __init__(self,  file, trackedShooter):
 
@@ -44,52 +48,41 @@ class Match():
         start = time.time()
         print("\nAdding shooters to stages. . .")
         keyCounter = 1
+        
         for stage in self.stageList:
-            for divCounter in range(1,9):
+                divCounter = 1
+                for div in self.divisions:
+                    try:
 
-                    divString = ""
+                        # Grab the list of dicts for the shooters
+                        shooterList = []
+                        shooterList = self.dataFrame[stage.stageName][keyCounter][divCounter][div]
 
-                    if divCounter == 1:
-                        divString = 'Carry Optics'
-                    elif divCounter == 2:
-                        divString = 'Limited'
-                    elif divCounter == 3:
-                        divString = 'Limited Optics'
-                    elif divCounter == 4:
-                        divString = 'Open'
-                    elif divCounter == 5:
-                        divString = 'PCC'
-                    elif divCounter == 6:
-                        divString = 'Production'
-                    elif divCounter == 7:
-                        divString = 'Revolver'
-                    elif divCounter == 8:
-                        divString = 'Single Stack'
+                        for shooter in shooterList:
+                            # Construct the master shooter list
+                            newShooter = Shooter(
 
-                    # Grab the list of dicts for the shooters
-                    shooterList = []
-                    shooterList = self.dataFrame[stage.stageName][keyCounter][divCounter][divString]
+                                stage.stageName,
+                                shooter.get('shooterName'),
+                                shooter.get('division'),
+                                shooter.get('shooterClass'),
+                                shooter.get('place'),
+                                shooter.get('stagePercent'),
+                                shooter.get('stageTimeSecs'),
+                                shooter.get('stagePoints'),
+                                shooter.get('hitFactor'),
+                                shooter.get('points'),
+                                shooter.get('penalties')
+                            )
 
-                    for shooter in shooterList:
-                        # Construct the master shooter list
-                        newShooter = Shooter(
+                            stage.addShooter(newShooter)
 
-                            stage.stageName,
-                            shooter.get('shooterName'),
-                            shooter.get('division'),
-                            shooter.get('shooterClass'),
-                            shooter.get('place'),
-                            shooter.get('stagePercent'),
-                            shooter.get('stageTimeSecs'),
-                            shooter.get('stagePoints'),
-                            shooter.get('hitFactor'),
-                            shooter.get('points'),
-                            shooter.get('penalties')
-                        )
+                        divCounter += 1
+                
+                    except KeyError:
+                        print(f'Division "{div}" not present on {stage.stageName}.')
 
-                        stage.addShooter(newShooter)
-            
-            keyCounter += 1
+                keyCounter += 1
 
         stop = time.time()    
         print(f'Done! ({stop - start:0.3f}s)')
@@ -98,13 +91,13 @@ class Match():
 if __name__ == "__main__":
 
 
-    mtch = Match ("resultsfile.json", "Miller, Doryan")
+    mtch = Match ("match2.json", "Miller, Doryan")
 
     mtch.populateStages()
     mtch.fillStages()
 
     for stage in mtch.stageList:
         stage.loadAll()
-        stage.showClassStats("G")
+        stage.showClassStats("C")
 
 

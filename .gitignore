@@ -1,6 +1,6 @@
-/jsonExplore.py
 /Request.py
-/resultsfile.json
-/ShooterAnalysis/resultsfile.json
+/*.json
+/ShooterAnalysis/*.json
 /.vscode/launch.json
-/ShooterAnalysis/__pycache__/
+ShooterAnalysis/__pycache__/
+ShooterAnalysis/__pycache__/*.*
