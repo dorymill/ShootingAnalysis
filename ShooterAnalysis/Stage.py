@@ -275,8 +275,19 @@ class Stage:
         paraBins     = []
         paraBinWidth = []
 
+        
+
+        fig, axs = plt.subplots(2,3, figsize=(15, 10), layout="constrained")
+        i = 0
+        j = 0
+
         for para in self.parameters:
 
+            # Handle which axis to plot on
+            if (j > 2):
+                j = 0
+                i = 1
+                
             data = self.classDictionary[sClass][para]
 
             q75, q25 = np.percentile(data, [75, 25])
@@ -298,14 +309,14 @@ class Stage:
                 bins = N
 
             # Plot the histogram.
-            plt.hist(data, bins=int(bins), density=True, alpha=0.6, color='grey', edgecolor='white')
+            #axs[i,j].hist(data, bins=int(bins), density=True, alpha=0.6, color='grey', edgecolor='white')
 
             # Plot a normal distribution over the histogram
             mu, std = norm.fit(data) 
-            xmin, xmax = plt.xlim()
+            xmin, xmax = (np.min(data), np.max(data))
             x = np.linspace(xmin, xmax, 1000)
             p = norm.pdf(x, mu, std)
-            plt.plot(x, p, 'k', linewidth=1)
+            axs[i,j].plot(x, p, 'k', linewidth=1)
  
             # Capture and plot the trackedShooters metric here
             trackedParam = 0.
@@ -324,17 +335,24 @@ class Stage:
                     elif para == "penalties":
                         trackedParam = shooter.penalties
 
-            plt.vlines(x = trackedParam, ymin = 0, ymax = norm.pdf(trackedParam, mu, std),
+            axs[i,j].vlines(x = trackedParam, ymin = 0, ymax = norm.pdf(trackedParam, mu, std),
                                 colors = 'blue',
                                 label = f'{self.trackedShooter} ({trackedParam})')
             
             # Plot parameters
-            plt.title(f'{para} Distribution for {self.stageName} ({sClass})')
-            plt.legend()
-            plt.set_cmap('gray')
-            plt.xlabel(para)
-            plt.ylabel("Amplitude")
-            plt.show()
+            axs[i,j].set_title(f'{para} ({sClass})')
+            axs[i,j].legend()
+            axs[i,j].set(xlabel=para, ylabel="Amplitude")
+
+            j += 1
+
+
+        
+        # fig.tight_layout()
+        fig.suptitle(f'{self.stageName} Statistics')
+        #plt.show()
+        fig.savefig(f'{self.stageName}_{sClass}.png')
+    
         
     # Calculate and show Stage Statistics
     def showOverallStats(self):
@@ -342,7 +360,16 @@ class Stage:
         paraBins     = []
         paraBinWidth = []
 
+        fig, axs = plt.subplots(2,3, figsize=(15, 10), layout="constrained")
+        i = 0
+        j = 0
+
         for para in self.parameters:
+
+                        # Handle which axis to plot on
+            if (j > 2):
+                j = 0
+                i = 1
 
             data = self.overallDictionary[para]
 
@@ -366,14 +393,14 @@ class Stage:
             paraBinWidth.append(binWidth)
 
             # Plot the histogram.
-            plt.hist(data, bins=int(bins), density=True, alpha=0.6, color='grey', edgecolor='white')
+            #plt.hist(data, bins=int(bins), density=True, alpha=0.6, color='grey', edgecolor='white')
 
             # Plot a normal distribution over the histogram
             mu, std = norm.fit(data) 
-            xmin, xmax = plt.xlim()
+            xmin, xmax = (np.min(data), np.max(data))
             x = np.linspace(xmin, xmax, 1000)
             p = norm.pdf(x, mu, std)
-            plt.plot(x, p, 'k', linewidth=1)
+            axs[i,j].plot(x, p, 'k', linewidth=1)
 
             # Capture and plot the trackedShooters metric here
             trackedParam = 0.
@@ -391,18 +418,22 @@ class Stage:
                         trackedParam = shooter.points
                     elif para == "penalties":
                         trackedParam = shooter.penalties
+        
 
-            plt.vlines(x = trackedParam, ymin = 0, ymax = norm.pdf(trackedParam, mu, std),
+            # Plot parameters
+            axs[i,j].vlines(x = trackedParam, ymin = 0, ymax = norm.pdf(trackedParam, mu, std),
                                 colors = 'blue',
                                 label = f'{self.trackedShooter} ({trackedParam})')
+                
+            fig.suptitle(f'{self.stageName} Overall Statistics')
 
-            
-            # Plot parameters
-            plt.title(f'{para} Distribution for {self.stageName} (All Classes)')
-            plt.set_cmap('gray')
-            plt.xlabel(para)
-            plt.ylabel("Probability")
-            plt.show()
+            axs[i,j].set_title(f'{para} {self.stageName} (All)')
+            axs[i,j].set(xlabel=para, ylabel="Amplitude")
+
+            # plt.show()
+            fig.savefig(f'{self.stageName}_Overall.png')
+            j += 1
+
     
     def addShooter(self, shooter):
         if(shooter.parentStage == self.stageName):

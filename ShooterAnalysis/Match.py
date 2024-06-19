@@ -91,7 +91,7 @@ class Match():
 if __name__ == "__main__":
 
 
-    mtch = Match ("match2.json", "Miller, Doryan")
+    mtch = Match ("match3.json", "Miller, Doryan")
 
     mtch.populateStages()
     mtch.fillStages()
@@ -99,5 +99,6 @@ if __name__ == "__main__":
     for stage in mtch.stageList:
         stage.loadAll()
         stage.showClassStats("C")
+        # stage.showOverallStats()
 
 
