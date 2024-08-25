@@ -6,15 +6,11 @@ from Stage import Stage
 from Shooter import Shooter
 import pandas as pd
 import time
+import sys
 
 class Match():
 
-    # Tracked shooter (statistical highlighting)
-    trackedShooter = ""
 
-    # Possible Shooter Divisions
-    divisions = ["Carry Optics", "Limited", "Limited Optics", "Open", 
-                "PCC", "Production", "Revolver", "Single Stack"]
 
     # Initialize instance attritbutes
     def __init__(self,  file, trackedShooter):
@@ -25,7 +21,15 @@ class Match():
         self.stageList = []
         self.stageKeys = []
         self.masterShooterList = []
+
+        # Tracked shooter (statistical highlighting)
         self.trackedShooter = trackedShooter
+
+        # Possible Shooter Divisions
+        self.divisions = ["Carry Optics", "Limited", "Limited Optics", "Open", 
+                "PCC", "Production", "Revolver", "Single Stack"]
+    
+        self.classes = ["G", "M", "A", "B", "C", "D", "U"]
 
     # Populate stages with shooters
     def populateStages(self):
@@ -53,7 +57,6 @@ class Match():
                 divCounter = 1
                 for div in self.divisions:
                     try:
-
                         # Grab the list of dicts for the shooters
                         shooterList = []
                         shooterList = self.dataFrame[stage.stageName][keyCounter][divCounter][div]
@@ -82,23 +85,84 @@ class Match():
                     except KeyError:
                         print(f'Division "{div}" not present on {stage.stageName}.')
 
+                    except IndexError:
+                        # This isn't apparently an issue
+                        #print(f'Json has different structure than expected.')
+                        continue
+
                 keyCounter += 1
 
         stop = time.time()    
-        print(f'Done! ({stop - start:0.3f}s)')
+        print(f'Done! ({stop - start:0.3f}s)\n')
 
 
 if __name__ == "__main__":
 
+    # Avaliable Classes and Divisions
+    classes = ["G", "M", "A", "B", "C", "D", "U"]
+    divisions = ["Carry Optics", "Limited", "Limited Optics", "Open", 
+                "PCC", "Production", "Revolver", "Single Stack"]
 
-    mtch = Match ("match3.json", "Miller, Doryan")
+    # No class/division flag provided, show overall
+    if(len(sys.argv) < 3):
+        print("\nUsage: python Match.py <match.json> <Tracked Shooter> -<option flag> <option>")
+        print("\nAvailable option flags:")
+        print("\n\t-o\t\tShows tracked shooter compared to overall statistics.")
+        print("\n\t-c <Class>\tShows tracked shooter compared to class. Ex: -c A")
+        print("\n\t-d <Division>\tShows tracked shooter compared to division. Ex: -d \"Carry Optics\".")
+        exit()
 
-    mtch.populateStages()
-    mtch.fillStages()
+    # Process Overall statistics
+    elif (len(sys.argv) == 4):
+        if(sys.argv[3] != "-o"):
+            print("\nMissing flag option. Did you mean -o?")
+            exit()
+        elif (sys.argv[3] == "-o"):
+            mtch = Match(sys.argv[1], sys.argv[2])
 
-    for stage in mtch.stageList:
-        stage.loadAll()
-        stage.showClassStats("C")
-        # stage.showOverallStats()
+            mtch.populateStages()
+            mtch.fillStages()
 
+            for stage in mtch.stageList:
+                stage.loadAll()
+                stage.showOverallStats()
+        else:
+            print("\nInvalid flag passed. Run \"python Match.py\" for available options.")
+
+    # Process specific Statistics
+    elif (len(sys.argv) == 5):
+        if(sys.argv[3] == "-o"):
+            print("\nToo many flag options! Did you mean -c or -d?")
+            exit()
+
+        # Process Class Statistics
+        if (sys.argv[3] == "-c"):
+            if(sys.argv[4] not in classes):
+                print("\nInvalid Class selected. Options: G, M, A, B, C, D, U.")
+            else:
+                mtch = Match(sys.argv[1], sys.argv[2])
+
+                mtch.populateStages()
+                mtch.fillStages()
+
+                for stage in mtch.stageList:
+                    stage.loadAll()
+                    stage.showClassStats(sys.argv[4])
+
+        elif (sys.argv[3] == "-d"):
+            if(sys.argv[4] not in divisions):
+                print("\nInvalid Division selected. Options: Carry Optics, Limited, Limited Optics, Open, PCC, Production, Revolver, Single Stack.")
+            else:
+                mtch = Match(sys.argv[1], sys.argv[2])
+
+                mtch.populateStages()
+                mtch.fillStages()
+
+                for stage in mtch.stageList:
+                    stage.loadAll()
+                    stage.showDivisionStats(sys.argv[4])
+
+    # Invalid input
+    else:
+        print("\nInvalid runtime options. Run \"python Match.py\" for available options.")
 

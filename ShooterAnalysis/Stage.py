@@ -5,7 +5,11 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import norm, rv_histogram
 import math
+import time
 
+# Ignore the warning from dividing by zero since histograms don't get used anyways.
+import warnings
+warnings.filterwarnings("ignore")
 
 class Stage:
 
@@ -281,6 +285,8 @@ class Stage:
         i = 0
         j = 0
 
+        start = time.time()
+        print(f'Calculating Class statistics for {self.stageName}. . .', end="", flush=True)
         for para in self.parameters:
 
             # Handle which axis to plot on
@@ -346,15 +352,13 @@ class Stage:
 
             j += 1
 
-
-        
-        # fig.tight_layout()
         fig.suptitle(f'{self.stageName} Statistics')
-        #plt.show()
         fig.savefig(f'{self.stageName}_{sClass}.png')
+
+        stop = time.time()    
+        print(f'Done! ({stop - start:0.3f}s)')
     
-        
-    # Calculate and show Stage Statistics
+    # Calculate and show Overall Stage Statistics
     def showOverallStats(self):
         
         paraBins     = []
@@ -364,6 +368,9 @@ class Stage:
         i = 0
         j = 0
 
+
+        start = time.time()
+        print(f'Calculating Overall statistics for {self.stageName}. . .', end="", flush=True)
         for para in self.parameters:
 
                         # Handle which axis to plot on
@@ -429,12 +436,97 @@ class Stage:
 
             axs[i,j].set_title(f'{para} {self.stageName} (All)')
             axs[i,j].set(xlabel=para, ylabel="Amplitude")
+            axs[i,j].legend()
 
             # plt.show()
             fig.savefig(f'{self.stageName}_Overall.png')
             j += 1
 
-    
+        stop = time.time()    
+        print(f'Done! ({stop - start:0.3f}s)')
+
+    # Calculate and show Division Statistics
+    def showDivisionStats(self, division):
+        paraBins     = []
+        paraBinWidth = []
+
+        start = time.time()
+        print(f'Calculating Division statistics for {self.stageName}. . .', end="", flush=True)
+        fig, axs = plt.subplots(2,3, figsize=(15, 10), layout="constrained")
+        i = 0
+        j = 0
+
+        for para in self.parameters:
+
+            # Handle which axis to plot on
+            if (j > 2):
+                j = 0
+                i = 1
+                
+            data = self.divisionDictionary[division][para]
+
+            q75, q25 = np.percentile(data, [75, 25])
+            iqr = q75 - q25
+            N = data.size
+
+            if(N <= 5):
+                print(f'Not enough data for statistics on {para} on {self.stageName}.')
+                continue
+
+            binWidth = 2*(iqr) / (N)**(0.3333333)
+            bins     = 2*(np.max(data) - np.min(data)) / binWidth
+
+            paraBins    .append(bins)
+            paraBinWidth.append(binWidth)
+ 
+             # Overflow handling
+            if(not math.isfinite(bins)):
+                bins = N
+
+            # Plot the histogram.
+            #axs[i,j].hist(data, bins=int(bins), density=True, alpha=0.6, color='grey', edgecolor='white')
+
+            # Plot a normal distribution over the histogram
+            mu, std = norm.fit(data) 
+            xmin, xmax = (np.min(data), np.max(data))
+            x = np.linspace(xmin, xmax, 1000)
+            p = norm.pdf(x, mu, std)
+            axs[i,j].plot(x, p, 'k', linewidth=1)
+ 
+            # Capture and plot the trackedShooters metric here
+            trackedParam = 0.
+            for shooter in self.shooterList:
+                if shooter.shooterName == self.trackedShooter:
+                    if para == "stagePercent":
+                        trackedParam = shooter.stagePercent
+                    elif para == "stageTimeSecs":
+                        trackedParam = shooter.stageTimeSecs
+                    elif para == "stagePoints":
+                        trackedParam = shooter.stagePoints
+                    elif para == "hitFactor":
+                        trackedParam = shooter.hitFactor
+                    elif para == "points":
+                        trackedParam = shooter.points
+                    elif para == "penalties":
+                        trackedParam = shooter.penalties
+
+            axs[i,j].vlines(x = trackedParam, ymin = 0, ymax = norm.pdf(trackedParam, mu, std),
+                                colors = 'blue',
+                                label = f'{self.trackedShooter} ({trackedParam})')
+            
+            # Plot parameters
+            axs[i,j].set_title(f'{para} ({division})')
+            axs[i,j].legend()
+            axs[i,j].set(xlabel=para, ylabel="Amplitude")
+
+            j += 1
+
+        fig.suptitle(f'{self.stageName} Statistics')
+        fig.savefig(f'{self.stageName}_{division}.png')
+
+        stop = time.time()    
+        print(f'Done! ({stop - start:0.3f}s)')
+     
     def addShooter(self, shooter):
         if(shooter.parentStage == self.stageName):
             self.shooterList.append(shooter)
