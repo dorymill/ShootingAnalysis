@@ -25,10 +25,11 @@ class Stage:
     trackedShooter = ""
 
     # Instace class attribute initialization
-    def __init__(self, stageName, trackedShooter):
+    def __init__(self, stageName, trackedShooter, shortFileName):
         
         # Stage name
         self.stageName = stageName
+        self.shortFileName = shortFileName
 
         # List of shooters (list of dictionaries)
         self.shooterList = []
@@ -354,7 +355,7 @@ class Stage:
             j += 1
 
         fig.suptitle(f'{self.stageName} Statistics')
-        fig.savefig(f'{self.stageName}_{sClass}.png')
+        fig.savefig(f'./{self.shortFileName}/Class/{self.stageName}_{sClass}.png')
 
         stop = time.time()    
         print(f'Done! ({stop - start:0.3f}s)')
@@ -440,7 +441,7 @@ class Stage:
             axs[i,j].legend()
 
             # plt.show()
-            fig.savefig(f'{self.stageName}_Overall.png')
+            fig.savefig(f'./{self.shortFileName}/Overall/{self.stageName}_Overall.png')
             j += 1
 
         stop = time.time()    
@@ -523,7 +524,7 @@ class Stage:
             j += 1
 
         fig.suptitle(f'{self.stageName} Statistics')
-        fig.savefig(f'{self.stageName}_{division}.png')
+        fig.savefig(f'./{self.shortFileName}/Division/{self.stageName}_{division}.png')
 
         stop = time.time()    
         print(f'Done! ({stop - start:0.3f}s)')

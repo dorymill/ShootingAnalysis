@@ -7,6 +7,7 @@ from Shooter import Shooter
 import pandas as pd
 import time
 import sys
+import os
 
 class Match():
 
@@ -16,6 +17,7 @@ class Match():
     def __init__(self,  file, trackedShooter):
 
         self.fileName = file
+        
 
         # List Stages inside of a match and list for their keys
         self.stageList = []
@@ -37,6 +39,15 @@ class Match():
         # Grab the JSON as a pandas dataframe
         print("\nReading stage file. . .")
         self.dataFrame = pd.read_json(self.fileName)
+        shortFileName = self.fileName.split(".")[0]
+
+        # Create the storage folders for artifacts
+        os.makedirs(shortFileName, exist_ok=True)
+
+        os.makedirs(shortFileName + "/Overall"   , exist_ok=True)
+        os.makedirs(shortFileName + "/Class"     , exist_ok=True)
+        os.makedirs(shortFileName + "/Division" , exist_ok=True)
+
         
         # Grab the stage keys that contain the word "Stage"
         for key in self.dataFrame.keys():
@@ -46,7 +57,7 @@ class Match():
 
         # Create the stages iteratively
         for key in self.stageKeys:
-            self.stageList.append(Stage (key, self.trackedShooter))
+            self.stageList.append(Stage (key, self.trackedShooter, shortFileName))
 
     def fillStages(self):
         start = time.time()
@@ -83,7 +94,8 @@ class Match():
                     divCounter += 1
             
                 except KeyError:
-                    print(f'Division "{div}" not present on {stage.stageName}.')
+                    #print(f'Division "{div}" not present on {stage.stageName}.')
+                    continue
 
                 except IndexError:
                     # This isn't apparently an issue
