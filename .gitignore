@@ -1,6 +1,8 @@
 /Request.py
 /*.json
 /ShooterAnalysis/*.json
+/ShooterAnalysis/*.bat
+/ShooterAnalysis/*/
 /.vscode/launch.json
 ShooterAnalysis/__pycache__/
 ShooterAnalysis/__pycache__/*.*

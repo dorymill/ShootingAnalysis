@@ -61,7 +61,7 @@ class Match():
 
     def fillStages(self):
         start = time.time()
-        print("\nAdding shooters to stages. . .")
+        print("\nAdding shooters to stages. . .", end="", flush=True)
         keyCounter = 1
         
         for stage in self.stageList:
