@@ -32,6 +32,7 @@ class Stage:
 
         # List of shooters (list of dictionaries)
         self.shooterList = []
+        self.overallShooterList = []
         self.trackedShooter = trackedShooter
 
         # Dictionaries containing stats for classes and divisions
@@ -241,7 +242,7 @@ class Stage:
 
     # Load overall stage data
     def loadOverallData(self):
-        for shooter in self.shooterList:
+        for shooter in self.overallShooterList:
             self.overallDictionary['stagePercent'] .append(shooter.stagePercent)
             self.overallDictionary['stageTimeSecs'].append(shooter.stageTimeSecs)
             self.overallDictionary['stagePoints']  .append(shooter.stagePoints)
@@ -373,7 +374,7 @@ class Stage:
         print(f'Calculating Overall statistics for {self.stageName}. . .', end="", flush=True)
         for para in self.parameters:
 
-                        # Handle which axis to plot on
+            # Handle which axis to plot on
             if (j > 2):
                 j = 0
                 i = 1
@@ -411,7 +412,7 @@ class Stage:
 
             # Capture and plot the trackedShooters metric here
             trackedParam = 0.
-            for shooter in self.shooterList:
+            for shooter in self.overallShooterList:
                 if shooter.shooterName == self.trackedShooter:
                     if para == "stagePercent":
                         trackedParam = shooter.stagePercent
@@ -530,6 +531,9 @@ class Stage:
     def addShooter(self, shooter):
         if(shooter.parentStage == self.stageName):
             self.shooterList.append(shooter)
+
+    def addShooterOverall(self, shooter):
+        self.overallShooterList.append(shooter)
 
     def showHitFactors(self):
 

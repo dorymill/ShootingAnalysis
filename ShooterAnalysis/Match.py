@@ -54,43 +54,66 @@ class Match():
         keyCounter = 1
         
         for stage in self.stageList:
-                divCounter = 1
-                for div in self.divisions:
-                    try:
-                        # Grab the list of dicts for the shooters
-                        shooterList = []
-                        shooterList = self.dataFrame[stage.stageName][keyCounter][divCounter][div]
+            divCounter = 1
+            for div in self.divisions:
+                try:
+                    # Grab the list of dicts for the shooters
+                    shooterList = []
+                    shooterList = self.dataFrame[stage.stageName][keyCounter][divCounter][div]
 
-                        for shooter in shooterList:
-                            # Construct the master shooter list
-                            newShooter = Shooter(
+                    # Construct the master shooter list
+                    for shooter in shooterList:
+                        newShooter = Shooter(
 
-                                stage.stageName,
-                                shooter.get('shooterName'),
-                                shooter.get('division'),
-                                shooter.get('shooterClass'),
-                                shooter.get('place'),
-                                shooter.get('stagePercent'),
-                                shooter.get('stageTimeSecs'),
-                                shooter.get('stagePoints'),
-                                shooter.get('hitFactor'),
-                                shooter.get('points'),
-                                shooter.get('penalties')
-                            )
+                            stage.stageName,
+                            shooter.get('shooterName'),
+                            shooter.get('division'),
+                            shooter.get('shooterClass'),
+                            shooter.get('place'),
+                            shooter.get('stagePercent'),
+                            shooter.get('stageTimeSecs'),
+                            shooter.get('stagePoints'),
+                            shooter.get('hitFactor'),
+                            shooter.get('points'),
+                            shooter.get('penalties')
+                        )
 
-                            stage.addShooter(newShooter)
+                        stage.addShooter(newShooter)
 
-                        divCounter += 1
-                
-                    except KeyError:
-                        print(f'Division "{div}" not present on {stage.stageName}.')
+                    divCounter += 1
+            
+                except KeyError:
+                    print(f'Division "{div}" not present on {stage.stageName}.')
 
-                    except IndexError:
-                        # This isn't apparently an issue
-                        #print(f'Json has different structure than expected.')
-                        continue
+                except IndexError:
+                    # This isn't apparently an issue
+                    #print(f'Json has different structure than expected.')
+                    continue
 
-                keyCounter += 1
+
+            # Add the overall scores too the stage overallShooterList
+            # since these %psbl's may differ
+            overallList = []
+            overallList = self.dataFrame[stage.stageName][keyCounter][0]['Overall']
+
+            for shooter in overallList:
+                newShooter = Shooter(
+                    stage.stageName,
+                    shooter.get('shooterName'),
+                    shooter.get('division'),
+                    shooter.get('shooterClass'),
+                    shooter.get('place'),
+                    shooter.get('stagePercent'),
+                    shooter.get('stageTimeSecs'),
+                    shooter.get('stagePoints'),
+                    shooter.get('hitFactor'),
+                    shooter.get('points'),
+                    shooter.get('penalties')
+                )
+
+                stage.addShooterOverall(newShooter)
+            
+            keyCounter += 1
 
         stop = time.time()    
         print(f'Done! ({stop - start:0.3f}s)\n')
